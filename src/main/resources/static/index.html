@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Web Service Clustering</title>
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+</head>
+
+<body>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Web Service Clustering</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+
+            </ul>
+        </div>
+    </nav>
+    <div class="row">
+        <form class="col s12">
+            <div class="input-field col s12">
+                <select class="qos">
+                    <option value="ResponseTime">ResponseTime</option>
+                    <option value="Availability">Availability</option>
+                    <option value="Throughput">Throughput</option>
+                    <option value="Successability">Successability</option>
+                    <option value="Reliability">Reliability</option>
+                    <option value="Compliance">Compliance</option>
+                    <option value="BestPractices">BestPractices</option>
+                    <option value="Latency">Latency</option>
+                    <option value="Documentation">Documentation</option>
+                </select>
+                <label>Select QOS Property:</label>
+            </div>
+            <button class="btn waves-effect waves-light" type="button" name="action">Submit
+                <i class="material-icons right">send</i>
+            </button>
+
+            <table id="location" class="striped">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>ServiceName</th>
+                        <th>ServiceURL</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </form>
+
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+    <script type="text/javascript">
+        var service = "http://localhost:8080/results";
+        jQuery.support.cors = true;
+        $(document).ready(function () {
+            $('select').material_select();
+            $("button").click(function () {
+                var data = {}
+                var selected = $(".qos option:selected").val();
+                data.attributeName = selected
+                console.log(data)
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:8080/results',
+                    data: JSON.stringify(data),
+                    contentType: "application/json",
+                    dataType: "json",
+                    cache: false,
+                    success: function (res) {
+                        var trHTML = '';
+                        $.each(res.result, function (i, item) {
+                            trHTML += '<tr><td>' + res.result[i].rank + '</td><td>' +
+                                res.result[i].serviceName + '</td><td>' + res.result[
+                                    i].serviceUrl + '</td></tr>'
+                        });
+                        $('#location tbody').remove();
+                        $('#location').append(trHTML);
+                    },
+                    error: function (err) {
+                        console.log('Error:', err);
+                    }
+                }).done(function (response) {
+                    console.log(response)
+                }).fail(function (error) {
+                    console.log('Error:', error)
+                })
+            });
+        });
+    </script>
+</body>
+
+</html>
